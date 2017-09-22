@@ -3,113 +3,70 @@
 class Stack
 {
 private:
-	class Element
-	{
+	class Element {
 	public:
-		Element( int val,Element* pNext )
+		Element(int value, Element* previous)
 			:
-			val( val ),
-			pNext( pNext )
+			value(value),
+			previous(previous)
 		{}
-		Element( const Element& src )
-			:
-			val( src.val )
-		{
-			if( src.pNext != nullptr )
-			{
-				pNext = new Element( *src.pNext );
-			}
-		}
-		Element& operator=( const Element& ) = delete;
-		int GetVal() const
-		{
-			return val;
-		}
-		Element* Disconnect()
-		{
-			auto pTemp = pNext;
-			pNext = nullptr;
-			return pTemp;
-		}
-		int CountElements() const
-		{
-			if( pNext != nullptr )
-			{
-				return pNext->CountElements() + 1;
-			}
-			else
-			{
-				return 1;
-			}
-		}
-		~Element()
-		{
-			delete pNext;
-			pNext = nullptr;
-		}
-	private:
-		int val;
-		Element* pNext = nullptr;
-	};
-public:
-	Stack() = default;
-	Stack( const Stack& src )
-	{
-		*this = src;
-	}
-	Stack& operator=( const Stack& src )
-	{
-		if( !Empty() )
-		{
-			delete pTop;
-			pTop = nullptr;
+
+		int Value() const {
+			return value;
 		}
 
-		if( !src.Empty() )
-		{
-			pTop = new Element( *src.pTop );
+		Element& Previous() const {
+			return *previous;
 		}
+
+	public:
+		Element& operator=(const Element& source) {
+			value = source.value;
+
+			if (source.previous != nullptr)
+				previous = new Element(*source.previous);
+			else previous = nullptr;
+
+			return *this;
+		}
+		Element(const Element& source) {
+			*this = source;
+		}
+		~Element() = default;
+
+	private:
+		int value;
+		Element* previous = nullptr;
+	};
+
+public:
+	Stack() = default;
+
+	Stack& operator=(const Stack& source) {
+		nElements = source.nElements;
+		top = new Element(*source.top);
 		return *this;
 	}
-	~Stack()
-	{
-		delete pTop;
-		pTop = nullptr;
+
+	Stack(const Stack& source) {
+		*this = source;
 	}
-	void Push( int val )
-	{
-		pTop = new Element( val,pTop );
-	}
-	int Pop()
-	{
-		if( !Empty() )
-		{
-			const int tempVal = pTop->GetVal();
-			auto pOldTop = pTop;
-			pTop = pTop->Disconnect();
-			delete pOldTop;
-			return tempVal;
-		}
-		else
-		{
-			return -1;
+
+	~Stack() {
+		Element* prev;
+		for (Element* current = top; current != nullptr; current = prev) {
+			prev = &current->Previous();
+			delete current;
 		}
 	}
-	int Size() const
-	{
-		if( !Empty() )
-		{
-			return pTop->CountElements();
-		}
-		else
-		{
-			return 0;
-		}
-	}
-	bool Empty() const
-	{
-		return pTop == nullptr;
-	}
+
+public:
+	void Push(int val);
+	int Pop();
+	int Size() const;
+	bool Empty() const;
+
 private:
-	Element* pTop = nullptr;
+	int nElements = 0;
+	Element* top = nullptr;
 };
